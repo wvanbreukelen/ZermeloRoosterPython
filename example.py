@@ -2,7 +2,6 @@ import Zermelo;
 
 api = Zermelo.API('SCHOOL');
 
-api.getStudentGrid(999, 999999999, 9999999999);
+api.getStudentGrid(256, 255447558, 44568478);
 
-#print(api.callAPI("test", {"test": "test"}));
-api.saveToken("CODE");
+api.grabAccessToken('999999', '9999999999999');

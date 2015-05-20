@@ -17,21 +17,56 @@ class API:
 
 		print(id);
 
-	def saveToken(user, token):
-		current = [];
+	def grabAccessToken(self, user, code, save=True):
+		code = code.replace(" ", "");
+
+		raw = self.callAPIPost("api/v2/oauth/token", {"grant_type": "authorization_code", "code": "88888888888"});
+
+		print(raw);
+
+
+
+	def getToken(self, id):
+		# Check if cache file does exists
 
 		if os.path.isfile('cache.json') is True:
-			file = open('cache.json', 'r');
+			filereader = open('cache.json', 'r');
 
-			current.append(json.loads(file.readline()));
+			data = json.loads(filereader.readline());
+
+			if str(id) in data:
+				return data[str(id)];
+			else:
+				return None;
+
+
+	def saveToken(self, id, token):
+
+		current = [];
 		
-		current.append("{token : " + str(token) + "}");
+		# Check for an existing cache file
+		if os.path.isfile('cache.json') is True:
+			filereader = open('cache.json', 'r');
 
-		print(current);
+			current = json.loads(filereader.readline());
+			filereader.close();
+
+		current['tokens'][str(user)] = token;
+
+		jsonraw = json.dumps(current['tokens']);
+
+		# Clear the old cache file
+		open('cache.json', 'w').close()
+
+		# Write the new cache file
+		filewriter = open('cache.json', 'w');
+		filewriter.write(jsonraw);
+
+		filewriter.close()
 
 
 
-	def callAPI(self, url, payload=[]):
+	def callAPI(self, uri, payload=[]):
 		# Receive the base url
 
 		baseurl = self.getBaseURL();
@@ -41,14 +76,14 @@ class API:
 		request = requests.get(baseurl, params=payload);
 		return request.url;
 
-	def callAPIPost(self, url, payload=[]):
+	def callAPIPost(self, uri, payload):
 		# Receive the base url
 
-		baseurl = self.getBaseURL();
+		baseurl = self.getBaseURL(uri);
 
 		# Creating a request
 
-		request = requests.post(baseurl, data=payload);
+		request = requests.post(baseurl, payload, verify=False);
 		return request.text;
 
 	def getBaseURL(self, uri=""):
